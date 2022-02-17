@@ -26,7 +26,7 @@ if __name__ == '__main__':
             y = round(human.body_parts[j].y*h,2)
             coordinates.append((j,x,y))
 
-        people['Person'+str(i+1)] = coordinates
+        people['person'+str(i+1)] = coordinates
 
     people = dict(sorted(people.items(), key=lambda item: item[1][0][1]))
 
