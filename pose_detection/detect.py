@@ -21,7 +21,7 @@ def anglecalc(keypoint_list,n1,n2,n3):
 
 if __name__ == '__main__':
 
-    image = 'demo/demo_4.jpeg'       # image path
+    image = 'demo/WhatsApp Image 2022-02-23 at 12.14.55 PM.jpeg'       # image path
     image = common.read_imgfile(image, None, None)
     w, h = model_wh('432x368')       # image resolution - fix at 432x368
 
@@ -47,9 +47,8 @@ if __name__ == '__main__':
     for k in range(0,len(people)):
         people_coordinates['Person'+str(k+1)] = people[str(list(people.items())[k][0])]
 
-
-    print(people_coordinates)
+    #print(people_coordinates)
     plt.imshow(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
-    angle = anglecalc(people_coordinates['Person1'],1,8,9)
+    angle = anglecalc(people_coordinates['Person1'],8,1,11)
     print(angle)
     plt.show()
