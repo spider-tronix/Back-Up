@@ -1,4 +1,9 @@
 import time
+print("Clear data(y/n)?")
+resp = input()
+if(resp == "y"):
+    print("Clearing......")
+    import clear_data
 print("Sit erect for calibration...")
 print("Calibrating in....")
 time.sleep(1)

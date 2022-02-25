@@ -64,13 +64,13 @@ def slouchdetect():
     for i in range(0,len(people_coordinates)):
         output['Person'+str(i+1)] = (anglecalc(people_coordinates['Person'+str(i+1)],8,1,11), distancecalc(people_coordinates['Person'+str(i+1)]))
 
-    '''plt.imshow(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
-    plt.show()'''
+    plt.imshow(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
+    plt.show()
 
     return output,people_coordinates
 
 op,people_coordinates = slouchdetect()
-print(op)
+#print(op)
 
 from openpyxl import load_workbook
 import math
@@ -111,6 +111,7 @@ i = 1
 n_ppl = len(people_coordinates)
 
 l = 2
+
 while l <= (sheet.cell(row=2, column=16).value+1):
     sheet.cell(row=l, column=12).value = "N" # Resetting presence column
     sheet.cell(row=l, column=14).value = "NA"

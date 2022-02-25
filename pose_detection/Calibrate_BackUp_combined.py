@@ -64,8 +64,8 @@ def slouchdetect():
     for i in range(0,len(people_coordinates)):
         output['Person'+str(i+1)] = (anglecalc(people_coordinates['Person'+str(i+1)],8,1,11), distancecalc(people_coordinates['Person'+str(i+1)]))
 
-    '''plt.imshow(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
-    plt.show()'''
+    plt.imshow(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
+    plt.show()
 
     return output,people_coordinates
 

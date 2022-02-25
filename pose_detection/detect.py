@@ -29,10 +29,10 @@ def distancecalc(keypoint_list):
 
 def slouchdetect():
 
-    #image = 'demo/WhatsApp Image 2022-02-24 at 5.11.42 PM.jpeg'
-    #image = common.read_imgfile(image, None, None)
-    cam = cv2.VideoCapture(0)
-    res, image = cam.read()
+    image = 'demo/WhatsApp Image 2022-02-24 at 5.11.42 PM.jpeg'
+    image = common.read_imgfile(image, None, None)
+    #cam = cv2.VideoCapture(0)
+    #res, image = cam.read()
 
     w, h = model_wh('432x368')
     e = TfPoseEstimator(get_graph_path('cmu'), target_size=(w, h))
@@ -40,8 +40,8 @@ def slouchdetect():
     image = TfPoseEstimator.draw_humans(image, humans, imgcopy=False)
     image = cv2.resize(image,dsize=(432,368))
 
-    '''plt.imshow(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
-    plt.show()'''
+    plt.imshow(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
+    plt.show()
 
     people = {}
     for i,human in enumerate(humans):
@@ -61,7 +61,7 @@ def slouchdetect():
     for i in range(0,len(people_coordinates)):
         output['Person'+str(i+1)] = (anglecalc(people_coordinates['Person'+str(i+1)],8,1,11), distancecalc(people_coordinates['Person'+str(i+1)]))
 
-    return output
+    return people_coordinates
 
 op = slouchdetect()
 print(op)
