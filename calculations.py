@@ -1,11 +1,6 @@
 from mimetypes import init
-from image_process import get_coordinates, feed_input
 import math
 import numpy as np
-
-input_image = feed_input('demo_image')
-output_image, output_coordinates = get_coordinates(input_image)
-n_ppl = len(output_coordinates)
 
 def init_coordinates(output_coordinates, person):
     coordinates = {}
@@ -55,8 +50,6 @@ def distance(coordinates, part1, part2):
 
 def calc_parameters(coordinates):
     param = {}
-    param['n_ppl'] = n_ppl
-
     shoulder_width = coordinates['left_shoulder'][0] - coordinates['right_shoulder'][0]
     param['X_left'] = coordinates['neck'][0] - 0.65*shoulder_width
     param['X_right'] = coordinates['neck'][0] + 0.65*shoulder_width
@@ -68,5 +61,5 @@ def calc_parameters(coordinates):
     param['nose_to_hip_length'] = distance(coordinates,'nose','centre_hip')
     param['Y_up'] = coordinates['nose'][1]
     param['Y_down'] = (coordinates['neck'][1] + coordinates['centre_hip'][1])/2
-    
+
     return param
