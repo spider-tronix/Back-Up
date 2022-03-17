@@ -10,5 +10,6 @@ def clear(file_name):
                 for cell in column:
                     cell.value = None
             l += 1
-
     workbook.save(filename= file_name)
+
+clear('Back-Up API person data.xlsx')

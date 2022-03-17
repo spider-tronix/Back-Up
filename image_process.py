@@ -1,4 +1,3 @@
-from cgi import test
 from tf_pose import common
 import cv2
 from tf_pose.estimator import TfPoseEstimator
@@ -34,14 +33,14 @@ def get_coordinates(image):
 
     return output_image,ouput_coordinates
 
-def feed_input(mode):
+def feed_input(mode,img_path):
 
     if mode == 'webcam':
         cam = cv2.VideoCapture(0)
         res, input_image = cam.read()
 
     elif mode == 'demo_image':
-        input_image_path = 'demo/demo_100.png'
+        input_image_path = img_path
         input_image = common.read_imgfile(input_image_path, None, None)
 
     elif mode == 'rpi':
@@ -79,3 +78,4 @@ def covert_to_fisheye():
 
     obj = Defisheye(img, dtype=dtype, format=format, fov=fov, pfov=pfov)
     obj.convert(img_out)
+

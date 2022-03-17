@@ -13,20 +13,22 @@ def init_coordinates(output_coordinates, person):
     coordinates['left_hip'] = (output_coordinates[person][11][1],output_coordinates[person][11][2])
     coordinates['centre_hip'] = ((coordinates['right_hip'][0] + coordinates['right_hip'][1])/2, 
                                  (coordinates['left_hip'][0] + coordinates['left_hip'][1])/2)
+                                 
+    if coordinates['nose'][0] < min(coordinates['right_shoulder'][0],coordinates['left_shoulder'][0]) or coordinates['nose'][0] > max(coordinates['right_shoulder'][0],coordinates['left_shoulder'][0]):
 
-    if coordinates['nose'][0] > coordinates['neck'][0]:
-        paral_x = coordinates['neck'][0] + 30
-    else:
-        paral_x = coordinates['neck'][0] - 30
-    paral_y = coordinates['neck'][1]
-    coordinates['collar_parallel'] = (paral_x,paral_y)
+        if coordinates['nose'][0] > coordinates['neck'][0]:
+            paral_x = coordinates['neck'][0] + 30
+        else:
+            paral_x = coordinates['neck'][0] - 30
+        paral_y = coordinates['neck'][1]
+        coordinates['collar_parallel'] = (paral_x,paral_y)
 
-    if coordinates['neck'][0] > coordinates['centre_hip'][0]:
-        hparal_x = coordinates['centre_hip'][0] + 30
-    else:
-        hparal_x = coordinates['centre_hip'][0] - 30
-    hparal_y = coordinates['centre_hip'][1]
-    coordinates['hip_parallel'] = (hparal_x,hparal_y)
+        if coordinates['neck'][0] > coordinates['centre_hip'][0]:
+            hparal_x = coordinates['centre_hip'][0] + 30
+        else:
+            hparal_x = coordinates['centre_hip'][0] - 30
+        hparal_y = coordinates['centre_hip'][1]
+        coordinates['hip_parallel'] = (hparal_x,hparal_y)
 
     return coordinates
 
@@ -53,13 +55,14 @@ def calc_parameters(coordinates):
     shoulder_width = coordinates['left_shoulder'][0] - coordinates['right_shoulder'][0]
     param['X_left'] = coordinates['neck'][0] - 0.65*shoulder_width
     param['X_right'] = coordinates['neck'][0] + 0.65*shoulder_width
-
     param['torso_angle'] = anglecalc(coordinates,'neck','left_hip', 'right_hip')
     param['spine_length'] = distance(coordinates,'neck','centre_hip')
-    param['neck_angle'] = anglecalc(coordinates,'nose','neck','collar_parallel')
-    param['back_angle'] = anglecalc(coordinates,'neck','centre_hip','hip_parallel')
-    param['nose_to_hip_length'] = distance(coordinates,'nose','centre_hip')
     param['Y_up'] = coordinates['nose'][1]
     param['Y_down'] = (coordinates['neck'][1] + coordinates['centre_hip'][1])/2
+    param['nose_to_neck_length'] = distance(coordinates,'nose','neck')
+
+    if coordinates['nose'][0] < min(coordinates['right_shoulder'][0],coordinates['left_shoulder'][0]) or coordinates['nose'][0] > max(coordinates['right_shoulder'][0],coordinates['left_shoulder'][0]):
+        param['neck_angle'] = anglecalc(coordinates,'nose','neck','collar_parallel')
+        param['back_angle'] = anglecalc(coordinates,'neck','centre_hip','hip_parallel')
 
     return param
