@@ -1,7 +1,7 @@
 from calculations import init_coordinates,calc_parameters
 from openpyxl import load_workbook
 
-def slouch_detect_write_excel(calibrated_param, output_coordinates, file_name):
+def slouch_detect_write_excel(output_coordinates, file_name):
 
     workbook = load_workbook(file_name)
     sheet = workbook.active

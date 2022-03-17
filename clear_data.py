@@ -11,5 +11,3 @@ def clear(file_name):
                     cell.value = None
             l += 1
     workbook.save(filename= file_name)
-
-clear('Back-Up API person data.xlsx')
