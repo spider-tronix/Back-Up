@@ -4,7 +4,7 @@ import datetime
 
 def push_notify():
 
-    current_time = datetime.datetime.now()
+    current_time = datetime.datetime.now() 
 
     file = "Push_test.txt"              # File containing the slouching alert message
     eod_file = "Back-Up EOD.txt"        # File containing the cumulative slouch message
@@ -37,7 +37,7 @@ def push_notify():
                 # 2 is the number of minutes of slouching before alerting
                 workbook.save(filename=file_name)
 
-    if (current_time.hour >= 20): # Summary assuming office closing time as 8pm
+    """if (current_time.hour >= 20): # Summary assuming office closing time as 8pm
         for row in sheet.iter_rows(min_row=2, min_col=5, max_row=(n_ppl + 1), max_col=5):
             for cell in row:
                 API_KEY_2 = sheet.cell(row=cell.row, column=3).value
@@ -59,4 +59,4 @@ def push_notify():
                 seperate = [s2,s1,s0]
 
                 slouch = slouch.join(seperate)
-                push = pb.push_note(slouch, eod_text)
+                push = pb.push_note(slouch, eod_text)"""

@@ -3,6 +3,15 @@ import cv2
 from tf_pose.estimator import TfPoseEstimator
 from tf_pose.networks import get_graph_path, model_wh
 import matplotlib.pyplot as plt
+import base64
+import numpy as np
+import paho.mqtt.client as mqtt
+from queue import Queue
+import socket
+
+MQTT_RPI_IMG_RCV = "home/rpi1/images"
+MQTT_RPI_FRM_ITL_SEND = "home/rpi1/startstream"
+MQTT_SERVER = socket.gethostbyname(socket.gethostname())
 
 def get_coordinates(image):
     # Fix the image dimensions to 432x368
@@ -29,20 +38,40 @@ def get_coordinates(image):
     return output_image,ouput_coordinates
 
 def feed_input(mode,img_path):
+    input_image = np.zeros((5,4,3))
     if mode == 'webcam':
         cam = cv2.VideoCapture(0)
         res, input_image = cam.read()
     elif mode == 'demo_image':
         input_image_path = img_path
         input_image = common.read_imgfile(input_image_path, None, None)
-    elif mode == 'rpi':
-        # write code
-        pass
-    elif mode == 'esp32':
-        # write code
-        pass
+    elif type(mode) == list and mode[0] == 'rpi':
+        
+        client = mode[1]
+        image_queue = mode[2]
+        frame_interval = mode[3]
+
+        client.publish(MQTT_RPI_FRM_ITL_SEND, frame_interval)
+        input_image = image_queue.get()
+    
+    elif type(mode) == list and mode[0] == 'rpi_calib':
+        
+        client = mode[1]
+        image_queue = mode[2]
+        frame_interval = 0.0333
+
+        client.publish(MQTT_RPI_FRM_ITL_SEND, frame_interval)
+        while True:
+            input_image = image_queue.get()
+            cv2.imshow('Calibration Preview', input_image)
+            if cv2.waitKey(1) & 0xFF == ord('c'):
+                break
+
+        client.publish(MQTT_RPI_FRM_ITL_SEND, -1)
+
     else:
         print('Incorrect input mode')
+
     return input_image
 
 def testing():
@@ -62,3 +91,26 @@ def covert_to_fisheye():
     img_out = f"demo/example2_{dtype}_{format}_{pfov}_{fov}.jpg"
     obj = Defisheye(img, dtype=dtype, format=format, fov=fov, pfov=pfov)
     obj.convert(img_out)
+
+def initRPiCommClient():
+
+    image_queue = Queue(maxsize = 1)
+
+    def on_connect(client, userdata, flags, rc):
+        print("Connected with result code "+str(rc))
+        client.subscribe(MQTT_RPI_IMG_RCV)
+
+    def rpi_image_callback(client, userdata, msg):
+        nonlocal image_queue
+        img = base64.b64decode(msg.payload)
+        npimg = np.frombuffer(img, dtype=np.uint8)
+        frame = cv2.imdecode(npimg, 1)
+        if not image_queue.full():
+            image_queue.put(frame)
+
+    client = mqtt.Client()
+    client.on_connect = on_connect
+    client.connect(MQTT_SERVER)
+    client.message_callback_add(MQTT_RPI_IMG_RCV, rpi_image_callback)
+
+    return client, image_queue
