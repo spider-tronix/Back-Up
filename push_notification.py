@@ -60,3 +60,4 @@ def push_notify():
 
                 slouch = slouch.join(seperate)
                 push = pb.push_note(slouch, eod_text)"""
+

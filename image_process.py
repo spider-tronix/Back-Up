@@ -9,10 +9,6 @@ import paho.mqtt.client as mqtt
 from queue import Queue
 import socket
 
-MQTT_RPI_IMG_RCV = "home/rpi1/images"
-MQTT_RPI_FRM_ITL_SEND = "home/rpi1/startstream"
-MQTT_SERVER = socket.gethostbyname(socket.gethostname())
-
 def get_coordinates(image):
     # Fix the image dimensions to 432x368
     w, h = model_wh('432x368')
@@ -37,60 +33,52 @@ def get_coordinates(image):
 
     return output_image,ouput_coordinates
 
+MQTT_RPI_IMG_RCV = "home/rpi1/images"
+MQTT_RPI_FRM_ITL_SEND = "home/rpi1/startstream"
+MQTT_SERVER = socket.gethostbyname(socket.gethostname())
+
 def feed_input(mode,img_path):
     input_image = np.zeros((5,4,3))
+    
     if mode == 'webcam':
         cam = cv2.VideoCapture(0)
         res, input_image = cam.read()
+    
     elif mode == 'demo_image':
         input_image_path = img_path
         input_image = common.read_imgfile(input_image_path, None, None)
+    
     elif type(mode) == list and mode[0] == 'rpi':
-        
+        #send frame interval -1 for stop streaming
+        #send frame interval as a +ve no. x for the rpi to send continuous frames separated by x seconds
+        #send frame interval -2 for requesting for a single image
         client = mode[1]
         image_queue = mode[2]
-        frame_interval = mode[3]
-
-        client.publish(MQTT_RPI_FRM_ITL_SEND, frame_interval)
+        client.publish(MQTT_RPI_FRM_ITL_SEND, -2)
+        image_queue.queue.clear()
         input_image = image_queue.get()
+        while not image_queue.empty():
+            input_image = image_queue.get()
+        
     
     elif type(mode) == list and mode[0] == 'rpi_calib':
-        
         client = mode[1]
         image_queue = mode[2]
-        frame_interval = 0.0333
-
-        client.publish(MQTT_RPI_FRM_ITL_SEND, frame_interval)
         while True:
+            client.publish(MQTT_RPI_FRM_ITL_SEND, -2)
+            image_queue.queue.clear()
             input_image = image_queue.get()
+            while not image_queue.empty():
+                input_image = image_queue.get()
             cv2.imshow('Calibration Preview', input_image)
             if cv2.waitKey(1) & 0xFF == ord('c'):
                 break
-
-        client.publish(MQTT_RPI_FRM_ITL_SEND, -1)
+        #client.publish(MQTT_RPI_FRM_ITL_SEND, -1)
 
     else:
         print('Incorrect input mode')
 
     return input_image
-
-def testing():
-    input_image = feed_input('demo_image')
-    out_image,coordinates = get_coordinates(input_image)
-    plt.imshow(cv2.cvtColor(out_image, cv2.COLOR_BGR2RGB))
-    plt.show()
-    print(coordinates)
-
-def covert_to_fisheye():
-    from defisheye import Defisheye
-    dtype = 'linear'
-    format = 'fullframe'
-    fov = 180
-    pfov = 120
-    img = 'demo/WhatsApp Image 2022-02-24 at 5.11.43 PM.jpeg'
-    img_out = f"demo/example2_{dtype}_{format}_{pfov}_{fov}.jpg"
-    obj = Defisheye(img, dtype=dtype, format=format, fov=fov, pfov=pfov)
-    obj.convert(img_out)
 
 def initRPiCommClient():
 
@@ -114,3 +102,10 @@ def initRPiCommClient():
     client.message_callback_add(MQTT_RPI_IMG_RCV, rpi_image_callback)
 
     return client, image_queue
+
+def testing():
+    input_image = feed_input('demo_image','demo/Employees-working-collaboratively-in-an-open-floor-plan-office-1.jpg')
+    out_image,coordinates = get_coordinates(input_image)
+    plt.imshow(cv2.cvtColor(out_image, cv2.COLOR_BGR2RGB))
+    plt.show()
+    #print(coordinates)
