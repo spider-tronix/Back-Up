@@ -60,7 +60,6 @@ def feed_input(mode,img_path):
         while not image_queue.empty():
             input_image = image_queue.get()
         
-    
     elif type(mode) == list and mode[0] == 'rpi_calib':
         client = mode[1]
         image_queue = mode[2]
